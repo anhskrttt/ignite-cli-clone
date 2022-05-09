@@ -41,19 +41,26 @@ tasks:
       clear && printf '\e[3J'
       echo -e "
       This terminal has the \033[1mignite\033[0m binary already installed and ready to go.
-
       "
+      ##
+      # final.
+      gp sync-done ignite
+
   - name: Start earth
+    init: gp sync-await ignite
     command: ignite chain serve -c earth.yml
 
   - name: Start mars
+    init: gp sync-await ignite
     command: ignite chain serve -c mars.yml
+    openMode: split-right
 
-  - name: Terminate previous config
-    command: rm -rf ~/.ignite/relayer
 
   - name: Config relayer
-    command: ignite relayer configure -a \
+    init: gp sync-await ignite
+    command: |
+        rm -rf ~/.ignite/relayer
+        ignite relayer configure -a \
       --source-rpc "http://0.0.0.0:26657" \
       --source-faucet "http://0.0.0.0:4500" \
       --source-port "blog" \
@@ -70,12 +77,15 @@ tasks:
       --target-gaslimit 300000
 
   - name: Start layer
+    init: gp sync-await ignite
     command: ignite relayer connect
 
   - name: Send packet from E to M
+    init: gp sync-await ignite
     command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Mars, I'm Alice from Earth" --from alice --chain-id earth --home ~/.earth
 
   - name: Send packet from M to E
+    init: gp sync-await ignite
     command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Earth, I'm Alice from Mars" --from alice --chain-id mars --home ~/.mars --node tcp://localhost:26659
 
 ports:
