@@ -34,7 +34,7 @@ tasks:
 
       ##
       # cd into the .gitpod dir.
-      cd .gitpod
+      cd .gitpod/planet
 
       ##
       # print a welcome message.
