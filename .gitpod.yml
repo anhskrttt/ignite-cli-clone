@@ -43,6 +43,40 @@ tasks:
       This terminal has the \033[1mignite\033[0m binary already installed and ready to go.
 
       "
+  - name: Start earth
+    command: ignite chain serve -c earth.yml
+
+  - name: Start mars
+    command: ignite chain serve -c mars.yml
+
+  - name: Terminate previous config
+    command: rm -rf ~/.ignite/relayer
+
+  - name: Config relayer
+    command: ignite relayer configure -a \
+      --source-rpc "http://0.0.0.0:26657" \
+      --source-faucet "http://0.0.0.0:4500" \
+      --source-port "blog" \
+      --source-version "blog-1" \
+      --source-gasprice "0.0000025stake" \
+      --source-prefix "cosmos" \
+      --source-gaslimit 300000 \
+      --target-rpc "http://0.0.0.0:26659" \
+      --target-faucet "http://0.0.0.0:4501" \
+      --target-port "blog" \
+      --target-version "blog-1" \
+      --target-gasprice "0.0000025stake" \
+      --target-prefix "cosmos" \
+      --target-gaslimit 300000
+
+  - name: Start layer
+    command: ignite relayer connect
+
+  - name: Send packet from E to M
+    command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Mars, I'm Alice from Earth" --from alice --chain-id earth --home ~/.earth
+
+  - name: Send packet from M to E
+    command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Earth, I'm Alice from Mars" --from alice --chain-id mars --home ~/.mars --node tcp://localhost:26659
 
 ports:
   - port: 1317
