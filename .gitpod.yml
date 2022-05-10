@@ -34,7 +34,7 @@ tasks:
 
       ##
       # cd into the .gitpod dir.
-      cd .gitpod/planet
+      cd .gitpod
 
       ##
       # print a welcome message.
@@ -42,23 +42,39 @@ tasks:
       echo -e "
       This terminal has the \033[1mignite\033[0m binary already installed and ready to go.
       "
+
       ##
-      # final.
+      # Clone planet project
+      git clone https://github.com/anhskrttt/planet-ibc-cosmos.git
+      cd planet
+
+      ##
+      # final
       gp sync-done ignite
 
   - name: Start earth
     init: gp sync-await ignite
-    command: ignite chain serve -c earth.yml
+    command: |
+      ignite chain serve -c earth.yml
+      # gp sync-done earth
 
   - name: Start mars
     init: gp sync-await ignite
     command: ignite chain serve -c mars.yml
-    openMode: split-right
+    openMode: |
+      split-right gp sync-done mar
 
   - name: Config relayer
-    init: gp sync-await ignite
+    init: |
+      gp await-port 26657
+      gp await-port 26659
     command: |
+      ##
+      # Remove previous config
       rm -rf ~/.ignite/relayer
+
+      ##
+      # Setup relayer
       ignite relayer configure -a \
         --source-rpc "http://0.0.0.0:26657" \
         --source-faucet "http://0.0.0.0:4500" \
@@ -75,16 +91,16 @@ tasks:
         --target-prefix "cosmos" \
         --target-gaslimit 300000
 
-  - name: Start layer
-    init: gp sync-await ignite
-    command: ignite relayer connect
+      ## ignite relayer connect
+      # Start relayer
+      gp sync-done relayer_start
 
   - name: Send packet from E to M
-    init: gp sync-await ignite
+    init: gp sync-await relayer_start
     command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Mars, I'm Alice from Earth" --from alice --chain-id earth --home ~/.earth
 
   - name: Send packet from M to E
-    init: gp sync-await ignite
+    init: gp sync-await relayer_start
     command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Earth, I'm Alice from Mars" --from alice --chain-id mars --home ~/.mars --node tcp://localhost:26659
 
 ports:
