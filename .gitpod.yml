@@ -46,7 +46,6 @@ tasks:
       ##
       # Clone planet project.
       git clone https://github.com/anhskrttt/planet-ibc-cosmos.git
-      cd planet
 
       ##
       # Final.
@@ -54,11 +53,15 @@ tasks:
 
   - name: Start earth
     init: gp sync-await planet_creation
-    command: ignite chain serve -c earth.yml
+    command: |
+      cd planet-ibc-cosmos
+      ignite chain serve -c earth.yml
 
   - name: Start mars
     init: gp sync-await planet_creation
-    command: ignite chain serve -c mars.yml
+    command: |
+      cd planet-ibc-cosmos
+      ignite chain serve -c mars.yml
     openMode: split-right
 
   - name: Config relayer
@@ -66,6 +69,10 @@ tasks:
       gp await-port 26657
       gp await-port 26659
     command: |
+      ##
+      # Cd to correct file
+      cd planet-ibc-cosmos
+
       ##
       # Remove previous config
       rm -rf ~/.ignite/relayer
@@ -94,11 +101,15 @@ tasks:
 
   - name: Send packet from E to M
     init: gp sync-await relayer_start
-    command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Mars, I'm Alice from Earth" --from alice --chain-id earth --home ~/.earth
+    command: |
+      cd planet-ibc-cosmos
+      planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Mars, I'm Alice from Earth" --from alice --chain-id earth --home ~/.earth
 
   - name: Send packet from M to E
     init: gp sync-await relayer_start
-    command: planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Earth, I'm Alice from Mars" --from alice --chain-id mars --home ~/.mars --node tcp://localhost:26659
+    command: |
+      cd planet-ibc-cosmos
+      planetd tx blog send-ibc-post blog channel-0 "Hello" "Hello Earth, I'm Alice from Mars" --from alice --chain-id mars --home ~/.mars --node tcp://localhost:26659
 
 ports:
   - port: 1317
