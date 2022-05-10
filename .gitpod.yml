@@ -44,19 +44,18 @@ tasks:
       "
 
       ##
-      # Clone planet project
+      # Clone planet project.
       git clone https://github.com/anhskrttt/planet-ibc-cosmos.git
       cd planet
 
       ##
-      # final
+      # final.
       gp sync-done ignite
 
   - name: Start earth
     init: gp sync-await ignite
     command: |
       ignite chain serve -c earth.yml
-      # gp sync-done earth
 
   - name: Start mars
     init: gp sync-await ignite
