@@ -96,6 +96,10 @@ tasks:
         --target-gaslimit 300000
 
       ##
+      # Start relayer.
+      ignite relayer connect
+
+      ##
       # Final.
       gp sync-done relayer_start
 
