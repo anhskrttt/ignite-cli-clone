@@ -50,18 +50,16 @@ tasks:
 
       ##
       # final.
-      gp sync-done ignite
+      gp sync-done planet_creation
 
   - name: Start earth
-    init: gp sync-await ignite
-    command: |
-      ignite chain serve -c earth.yml
+    init: gp sync-await planet_creation
+    command: ignite chain serve -c earth.yml
 
   - name: Start mars
-    init: gp sync-await ignite
+    init: gp sync-await planet_creation
     command: ignite chain serve -c mars.yml
-    openMode: |
-      split-right gp sync-done mar
+    openMode: split-right gp sync-done mar
 
   - name: Config relayer
     init: |
@@ -90,8 +88,8 @@ tasks:
         --target-prefix "cosmos" \
         --target-gaslimit 300000
 
-      ## ignite relayer connect
-      # Start relayer
+      ##
+      # Final.
       gp sync-done relayer_start
 
   - name: Send packet from E to M
